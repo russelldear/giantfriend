@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using Newtonsoft.Json;
 using eBikeActivityUpdater.Models;
+using static eBikeActivityUpdater.Constants;
+using static eBikeActivityUpdater.Constants.EnvironmentVariables;
+using static eBikeActivityUpdater.Constants.FormatStrings;
+using static eBikeActivityUpdater.Constants.Headers;
+using static eBikeActivityUpdater.Constants.Routes;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -14,9 +19,7 @@ namespace eBikeActivityUpdater
 {
     public class Function
     {
-        private string _accessToken;
-
-        private HttpClient _httpClient = new HttpClient() { BaseAddress = new Uri("https://www.strava.com/") };
+        private readonly HttpClient _httpClient = new HttpClient{ BaseAddress = new Uri("https://www.strava.com/") };
 
         public async Task<string> FunctionHandler(string input, ILambdaContext context)
         {
@@ -24,13 +27,15 @@ namespace eBikeActivityUpdater
 
             var activities = await GetRecentActivities();
 
-            Console.WriteLine(JsonConvert.SerializeObject(activities));
+            Console.WriteLine($"{activities.Count} activities retrieved for update: {JsonConvert.SerializeObject(activities)}");
 
             foreach (var activity in activities)
             {
                 var updateableActivity = activity.ToUpdateable();
 
                 await UpdateActivity(activity.Id, updateableActivity);
+
+                Console.WriteLine($"Activity with id {activity.Id} updated.");
             }
 
             return input?.ToUpper();
@@ -38,7 +43,13 @@ namespace eBikeActivityUpdater
 
         private async Task EnsureAccessToken()
         {
-            var request = new HttpRequestMessage(HttpMethod.Post, $"api/v3/oauth/token?client_id={Environment.GetEnvironmentVariable("ClientId")}&client_secret={Environment.GetEnvironmentVariable("ClientSecret")}&refresh_token={Environment.GetEnvironmentVariable("RefreshToken")}&grant_type=refresh_token");
+            var queryParams = string.Format(
+                QueryParamFormat,
+                Environment.GetEnvironmentVariable(ClientId),
+                Environment.GetEnvironmentVariable(ClientSecret),
+                Environment.GetEnvironmentVariable(RefreshToken));
+
+            var request = new HttpRequestMessage(HttpMethod.Post, $"{TokenRoute}?{queryParams}");
 
             var response = await _httpClient.SendAsync(request);
 
@@ -46,18 +57,18 @@ namespace eBikeActivityUpdater
             {
                 var refreshTokenString = await response.Content.ReadAsStringAsync();
 
-                Console.WriteLine($"Refresh token string: {refreshTokenString}");
+                Console.WriteLine($"Refresh token response string: {refreshTokenString}");
 
                 var refreshTokenResponse = JsonConvert.DeserializeObject<RefreshTokenResponse>(refreshTokenString);
 
-                _accessToken = refreshTokenResponse.AccessToken;
+                var accessToken = refreshTokenResponse.AccessToken;
 
-                if (_httpClient.DefaultRequestHeaders.Contains("Authorization"))
+                if (_httpClient.DefaultRequestHeaders.Contains(Authorization))
                 {
-                    _httpClient.DefaultRequestHeaders.Remove("Authorization");
+                    _httpClient.DefaultRequestHeaders.Remove(Authorization);
                 }
 
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {_accessToken}");
+                _httpClient.DefaultRequestHeaders.Add(Authorization, $"Bearer {accessToken}");
             }
             else
             {
@@ -67,7 +78,7 @@ namespace eBikeActivityUpdater
 
         private async Task<List<Activity>> GetRecentActivities()
         {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"api/v3/athlete/activities");
+            var request = new HttpRequestMessage(HttpMethod.Get, GetActivitiesRoute);
 
             var response = await _httpClient.SendAsync(request);
 
@@ -75,11 +86,13 @@ namespace eBikeActivityUpdater
             {
                 var activitiesString = await response.Content.ReadAsStringAsync();
 
-                Console.WriteLine($"Activities string: {activitiesString}");
+                Console.WriteLine($"Activities response string: {activitiesString}");
 
                 var activities = JsonConvert.DeserializeObject<List<Activity>>(activitiesString);
 
-                return activities.Where(a => a.StartDateLocal.ToUniversalTime() > DateTime.UtcNow.AddHours(-1)).ToList();
+                var minutesToBackdate = int.Parse(Environment.GetEnvironmentVariable(BackdateMinutes));
+
+                return activities.Where(a => a.StartDateLocal.ToUniversalTime() > DateTime.UtcNow.AddMinutes(-minutesToBackdate)).ToList();
             }
             else
             {
@@ -91,7 +104,7 @@ namespace eBikeActivityUpdater
 
         private async Task UpdateActivity(long activityId, UpdateableActivity activity)
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, $"api/v3/activities/{activityId}")
+            var request = new HttpRequestMessage(HttpMethod.Put, $"{Routes.UpdateActivityRoute}/{activityId}")
             {
                 Content = new StringContent(JsonConvert.SerializeObject(activity), System.Text.Encoding.UTF8, "application/json")
             };
