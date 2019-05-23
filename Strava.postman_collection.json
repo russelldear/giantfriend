@@ -1,0 +1,144 @@
+{
+	"info": {
+		"_postman_id": "f53fe063-e510-4884-a1d2-d9a84a58fbe7",
+		"name": "Strava",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authorize",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://www.strava.com/api/v3/oauth/authorize?client_id=35612&redirect_uri=http://localhost&response_type=code&scope=read_all,activity:read,activity:write",
+					"protocol": "https",
+					"host": [
+						"www",
+						"strava",
+						"com"
+					],
+					"path": [
+						"api",
+						"v3",
+						"oauth",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "35612"
+						},
+						{
+							"key": "redirect_uri",
+							"value": "http://localhost"
+						},
+						{
+							"key": "response_type",
+							"value": "code"
+						},
+						{
+							"key": "scope",
+							"value": "read_all,activity:read,activity:write"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Access Token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://www.strava.com/api/v3/oauth/token?client_id=35612&client_secret=75d4e2df3b6a85f6ec8460f2150de531a4888668&code=26232d1a4fe37a39b4d9c510bb184f2b8a1a2f6c&grant_type=authorization_code",
+					"protocol": "https",
+					"host": [
+						"www",
+						"strava",
+						"com"
+					],
+					"path": [
+						"api",
+						"v3",
+						"oauth",
+						"token"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "35612"
+						},
+						{
+							"key": "client_secret",
+							"value": "75d4e2df3b6a85f6ec8460f2150de531a4888668"
+						},
+						{
+							"key": "code",
+							"value": "26232d1a4fe37a39b4d9c510bb184f2b8a1a2f6c"
+						},
+						{
+							"key": "grant_type",
+							"value": "authorization_code"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh Token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "https://www.strava.com/api/v3/oauth/token?client_id=35612&client_secret=75d4e2df3b6a85f6ec8460f2150de531a4888668&refresh_token=aeea4feb63e644a247f6af1f9a61ee34556122b9&grant_type=refresh_token",
+					"protocol": "https",
+					"host": [
+						"www",
+						"strava",
+						"com"
+					],
+					"path": [
+						"api",
+						"v3",
+						"oauth",
+						"token"
+					],
+					"query": [
+						{
+							"key": "client_id",
+							"value": "35612"
+						},
+						{
+							"key": "client_secret",
+							"value": "75d4e2df3b6a85f6ec8460f2150de531a4888668"
+						},
+						{
+							"key": "refresh_token",
+							"value": "aeea4feb63e644a247f6af1f9a61ee34556122b9"
+						},
+						{
+							"key": "grant_type",
+							"value": "refresh_token"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
