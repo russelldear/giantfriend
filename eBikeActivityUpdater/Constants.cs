@@ -20,6 +20,8 @@
             public const string ClientSecret = "ClientSecret";
             public const string RefreshToken = "RefreshToken";
             public const string BackdateMinutes = "BackdateMinutes";
+            public const string ActivityType = "ActivityType";
+            public const string GearId = "GearId";
         }
 
         public static class FormatStrings

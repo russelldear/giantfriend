@@ -5,7 +5,7 @@ namespace eBikeActivityUpdater
 {
     public static class Extensions
     {
-        public static UpdateableActivity ToUpdateable(this Activity source)
+        public static UpdateableActivity ToUpdateable(this Activity source, string activityType, string gearId)
         {
             return new UpdateableActivity
             {
@@ -13,8 +13,8 @@ namespace eBikeActivityUpdater
                  Description = source.Description?.ToString(),
                  Commute = source.Commute,
                  Trainer = source.Trainer,
-                 GearId = "b5873380",
-                 Type = "EBikeRide"
+                 GearId = gearId,
+                 Type = activityType
             };
         }
     }

@@ -31,11 +31,11 @@ namespace eBikeActivityUpdater
 
             foreach (var activity in activities)
             {
-                var updateableActivity = activity.ToUpdateable();
+                var updateableActivity = activity.ToUpdateable(Environment.GetEnvironmentVariable(ActivityType), Environment.GetEnvironmentVariable(GearId));
 
                 await UpdateActivity(activity.Id, updateableActivity);
 
-                Console.WriteLine($"Activity with id {activity.Id} updated.");
+                Console.WriteLine($"Activity with id {activity.Id} updated to have activity type {updateableActivity.Type} and gear id {updateableActivity.GearId}.");
             }
 
             return input?.ToUpper();
