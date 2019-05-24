@@ -22,3 +22,10 @@ DotnetCore lambda that updates recent Strava rides to be eBike rides, with a sel
   - In Postman or similar, make a POST to https://www.strava.com/api/v3/oauth/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={CODE_FROM_THE_PREVIOUS_STEP}&grant_type=authorization_code
 
 You'll get the RefreshToken for your environment variables in the reponse from that post.
+
+# Deployment
+- Create a lambda in the AWS console with the above environment variables
+- Run `dotnet lambda package` in the .csproj directory
+- Upload the resulting zip to your new lambda
+- ????
+- Profit!
