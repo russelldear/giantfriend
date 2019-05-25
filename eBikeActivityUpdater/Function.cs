@@ -5,6 +5,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using Newtonsoft.Json;
+using Amazon;
+using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using eBikeActivityUpdater.Models;
 using static eBikeActivityUpdater.Constants;
 using static eBikeActivityUpdater.Constants.EnvironmentVariables;
@@ -33,7 +36,7 @@ namespace eBikeActivityUpdater
             {
                 var updateableActivity = activity.ToUpdateable(Environment.GetEnvironmentVariable(ActivityType), Environment.GetEnvironmentVariable(GearId));
 
-                await UpdateActivity(activity.Id, updateableActivity);
+                await UpdateActivity(activity, updateableActivity);
 
                 Console.WriteLine($"Activity with id {activity.Id} updated to have activity type {updateableActivity.Type} and gear id {updateableActivity.GearId}.");
             }
@@ -102,19 +105,33 @@ namespace eBikeActivityUpdater
             return null;
         }
 
-        private async Task UpdateActivity(long activityId, UpdateableActivity activity)
+        private async Task UpdateActivity(Activity activity, UpdateableActivity updateableActivity)
         {
-            var request = new HttpRequestMessage(HttpMethod.Put, $"{Routes.UpdateActivityRoute}/{activityId}")
+            var request = new HttpRequestMessage(HttpMethod.Put, $"{Routes.UpdateActivityRoute}/{activity.Id}")
             {
-                Content = new StringContent(JsonConvert.SerializeObject(activity), System.Text.Encoding.UTF8, "application/json")
+                Content = new StringContent(JsonConvert.SerializeObject(updateableActivity), System.Text.Encoding.UTF8, "application/json")
             };
 
             var response = await _httpClient.SendAsync(request);
 
-            if (!response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode)
             {
+                LogUpdate(activity);
+            }
+            else 
+            { 
                 Console.WriteLine($"Update error: {JsonConvert.SerializeObject(response)}");
             }
+        }
+
+        public void LogUpdate(Activity activity)
+        {
+            var client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
+            var table = Table.LoadTable(client, "eBikeActivityUpdater");
+            var jsonText = JsonConvert.SerializeObject(activity);
+            var item = Document.FromJson(jsonText);
+
+            var result = table.PutItemAsync(item).Result;
         }
     }
 }
