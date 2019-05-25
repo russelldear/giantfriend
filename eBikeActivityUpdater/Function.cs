@@ -92,7 +92,7 @@ namespace eBikeActivityUpdater
 
                 var minutesToBackdate = int.Parse(Environment.GetEnvironmentVariable(BackdateMinutes));
 
-                return activities.Where(a => a.StartDateLocal.ToUniversalTime() > DateTime.UtcNow.AddMinutes(-minutesToBackdate)).ToList();
+                return activities.Where(a => a.StartDate.ToUniversalTime() > DateTime.UtcNow.AddMinutes(-minutesToBackdate)).ToList();
             }
             else
             {
