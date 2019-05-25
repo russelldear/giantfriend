@@ -14,6 +14,8 @@ using static eBikeActivityUpdater.Constants.EnvironmentVariables;
 using static eBikeActivityUpdater.Constants.FormatStrings;
 using static eBikeActivityUpdater.Constants.Headers;
 using static eBikeActivityUpdater.Constants.Routes;
+using Amazon.SimpleNotificationService.Model;
+using Amazon.SimpleNotificationService;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -45,6 +47,8 @@ namespace eBikeActivityUpdater
                     var updateableActivity = activity.ToUpdateable(Environment.GetEnvironmentVariable(ActivityType), Environment.GetEnvironmentVariable(GearId));
 
                     await UpdateActivity(activity, updateableActivity);
+
+                    await NotifyUpdate(activity);
 
                     Console.WriteLine($"Activity with id {activity.Id} updated to have activity type {updateableActivity.Type} and gear id {updateableActivity.GearId}.");
                 }
@@ -151,6 +155,20 @@ namespace eBikeActivityUpdater
             var item = Document.FromJson(jsonText);
 
             var result = await table.PutItemAsync(item);
+        }
+
+        private async Task NotifyUpdate(Activity activity)
+        {
+            var client = new AmazonSimpleNotificationServiceClient(RegionEndpoint.USEast1);
+
+            var request = new PublishRequest
+            {
+                Subject = $"Strava activity with start time {activity.StartDate} updated.",
+                Message = $"Original activity: {JsonConvert.SerializeObject(activity)}",
+                TopicArn = "arn:aws:sns:us-east-1:540629508292:eBikeActivityUpdater",
+            };
+
+            var response = await client.PublishAsync(request);
         }
     }
 }
