@@ -31,3 +31,5 @@ You'll get the RefreshToken for your environment variables in the reponse from t
 - Upload the resulting zip to your new lambda
 - ????
 - Profit!
+
+AWS CodeBuild will automate this for you on push - just point it at the buildspec.yml file.
