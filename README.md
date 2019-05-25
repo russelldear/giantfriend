@@ -2,7 +2,7 @@
 
 DotnetCore lambda that updates recent Strava rides to be eBike rides, with a specified bike.
 
-The Strava watch app doesn't let me start a ride as an eBike ride - I have to remember to go and change it later. This solves that problem.
+The Strava watch app doesn't let me start a ride as an eBike ride - I have to remember to go and change it later. This solves that problem. 
 
 ## Required Environment Variables
 - ClientId
