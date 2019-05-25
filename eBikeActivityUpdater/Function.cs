@@ -34,11 +34,20 @@ namespace eBikeActivityUpdater
 
             foreach (var activity in activities)
             {
-                var updateableActivity = activity.ToUpdateable(Environment.GetEnvironmentVariable(ActivityType), Environment.GetEnvironmentVariable(GearId));
+                var isUpdated = await IsActivityUpdated(activity);
 
-                await UpdateActivity(activity, updateableActivity);
+                if (isUpdated)
+                {
+                    Console.WriteLine($"Activity with id {activity.Id} has already been updated.");
+                }
+                else
+                {
+                    var updateableActivity = activity.ToUpdateable(Environment.GetEnvironmentVariable(ActivityType), Environment.GetEnvironmentVariable(GearId));
 
-                Console.WriteLine($"Activity with id {activity.Id} updated to have activity type {updateableActivity.Type} and gear id {updateableActivity.GearId}.");
+                    await UpdateActivity(activity, updateableActivity);
+
+                    Console.WriteLine($"Activity with id {activity.Id} updated to have activity type {updateableActivity.Type} and gear id {updateableActivity.GearId}.");
+                }
             }
 
             return input?.ToUpper();
@@ -116,7 +125,7 @@ namespace eBikeActivityUpdater
 
             if (response.IsSuccessStatusCode)
             {
-                LogUpdate(activity);
+                await LogUpdate(activity);
             }
             else 
             { 
@@ -124,14 +133,24 @@ namespace eBikeActivityUpdater
             }
         }
 
-        public void LogUpdate(Activity activity)
+        private async Task<bool> IsActivityUpdated(Activity activity)
+        {
+            var client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
+            var table = Table.LoadTable(client, "eBikeActivityUpdater");
+
+            var document = await table.GetItemAsync(activity.Id);
+
+            return document != null && document["Id"].AsLong() == activity.Id;
+        }
+
+        private async Task LogUpdate(Activity activity)
         {
             var client = new AmazonDynamoDBClient(RegionEndpoint.USEast1);
             var table = Table.LoadTable(client, "eBikeActivityUpdater");
             var jsonText = JsonConvert.SerializeObject(activity);
             var item = Document.FromJson(jsonText);
 
-            var result = table.PutItemAsync(item).Result;
+            var result = await table.PutItemAsync(item);
         }
     }
 }
