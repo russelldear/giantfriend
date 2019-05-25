@@ -1,0 +1,8 @@
+version: 0.2
+
+phases:
+  build:
+    commands:
+       - cd eBikeActivityUpdater
+       - dotnet tool install --global Amazon.Lambda.Tools --version 3.2.3
+       - dotnet lambda deploy-function eBikeActivityUpdater -function-role eBikeActivityUpdater-role-d1bbnhjl
