@@ -164,7 +164,7 @@ namespace eBikeActivityUpdater
             var request = new PublishRequest
             {
                 Subject = $"Strava activity with start time {activity.StartDate} updated.",
-                Message = $"Original activity: {JsonConvert.SerializeObject(activity)}",
+                Message = $"https://www.strava.com/activities/{activity.Id}{Environment.NewLine}{Environment.NewLine}Original activity: {JsonConvert.SerializeObject(activity)}",
                 TopicArn = "arn:aws:sns:us-east-1:540629508292:eBikeActivityUpdater",
             };
 
