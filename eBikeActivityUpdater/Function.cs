@@ -163,7 +163,7 @@ namespace eBikeActivityUpdater
 
             var request = new PublishRequest
             {
-                Subject = $"Strava activity with start time {activity.StartDate.toString("dd MMMM yyyy H:mm tt")} updated.",
+                Subject = $"Strava activity with start time {activity.StartDate.ToString("dd MMMM yyyy H:mm tt")} updated.",
                 Message = $"https://www.strava.com/activities/{activity.Id}{Environment.NewLine}{Environment.NewLine}Original activity: {JsonConvert.SerializeObject(activity)}",
                 TopicArn = "arn:aws:sns:us-east-1:540629508292:eBikeActivityUpdater",
             };
