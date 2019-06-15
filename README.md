@@ -8,13 +8,11 @@ The Strava watch app doesn't let me start a ride as an eBike ride - I have to re
 - ClientId
 - ClientSecret
 - RefreshToken
-- BackdateMinutes
 - ActivityType
 - GearId
 
 ### How to get that stuff ^^^
 - You get ClientId & Client Secret when you create your app at https://www.strava.com/settings/api
-- The lambda will go back in time this many minutes and change all the activities it finds. Set this to the longest Strava ride you're likely to do. Mine is 60 minutes for now.
 - ActivityType values are listed here: https://developers.strava.com/docs/reference/#api-models-ActivityType - I use EBikeRide
 - GearId - go to https://www.strava.com/settings/gear and click on the bike you want. The id is in the url - prefix it with 'b' and that's your gear id. Alternatively, run the lambda after you've manually updated an activity to use your selected bike; the `gear_id` (and a whole bunch of other stuff) will be spat out in the Cloudwatch logs.
 
