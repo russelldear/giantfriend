@@ -5,7 +5,7 @@
         public static class Routes
         {
             public const string TokenRoute = "api/v3/oauth/token";
-            public const string GetActivitiesRoute = "api/v3/athlete/activities";
+            public const string GetActivitiesRoute = "api/v3/athlete/activities?page=1&per_page=5";
             public const string UpdateActivityRoute = "api/v3/activities";
         }
 
