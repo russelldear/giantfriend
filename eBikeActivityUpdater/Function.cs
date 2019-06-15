@@ -104,11 +104,7 @@ namespace eBikeActivityUpdater
 
                 Console.WriteLine($"Activities response string: {activitiesString}");
 
-                var activities = JsonConvert.DeserializeObject<List<Activity>>(activitiesString);
-
-                var minutesToBackdate = int.Parse(Environment.GetEnvironmentVariable(BackdateMinutes));
-
-                return activities.Where(a => a.StartDate.ToUniversalTime() > DateTime.UtcNow.AddMinutes(-minutesToBackdate)).ToList();
+                return JsonConvert.DeserializeObject<List<Activity>>(activitiesString).ToList();
             }
             else
             {
