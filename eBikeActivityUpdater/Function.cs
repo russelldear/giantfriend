@@ -31,6 +31,8 @@ namespace eBikeActivityUpdater
             await EnsureAccessToken();
 
             var activities = await GetRecentActivities();
+            
+            activities = activities.Where(a => a.Type == "Ride").ToList();
 
             Console.WriteLine($"{activities.Count} activities retrieved for update: {JsonConvert.SerializeObject(activities)}");
 
