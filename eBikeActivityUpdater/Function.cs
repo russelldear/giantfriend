@@ -48,7 +48,8 @@ namespace eBikeActivityUpdater
                 {
                     var updateableActivity = activity.ToUpdateable(Environment.GetEnvironmentVariable(ActivityType), Environment.GetEnvironmentVariable(GearId));
 
-                    await UpdateActivity(activity, updateableActivity);
+                    // Not required now that Strava on Apple Watch has an ebike activity
+                    //await UpdateActivity(activity, updateableActivity);
 
                     await NotifyUpdate(activity);
 
