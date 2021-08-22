@@ -34,7 +34,7 @@ namespace eBikeActivityUpdater
             
             activities = activities.Where(a => a.Type == "Ride").ToList();
 
-            Console.WriteLine($"{activities.Count} activities retrieved for update: {JsonConvert.SerializeObject(activities)}");
+            //Console.WriteLine($"{activities.Count} activities retrieved for update: {JsonConvert.SerializeObject(activities)}");
 
             foreach (var activity in activities)
             {
@@ -42,7 +42,7 @@ namespace eBikeActivityUpdater
 
                 if (isUpdated)
                 {
-                    Console.WriteLine($"Activity with id {activity.Id} has already been updated.");
+                    //Console.WriteLine($"Activity with id {activity.Id} has already been updated.");
                 }
                 else
                 {
@@ -50,10 +50,13 @@ namespace eBikeActivityUpdater
 
                     // Not required now that Strava on Apple Watch has an ebike activity
                     //await UpdateActivity(activity, updateableActivity);
+                    
+                    // Logged so it gets ignored in future
+                    await LogUpdate(activity);
 
-                    await NotifyUpdate(activity);
+                    //await NotifyUpdate(activity);
 
-                    Console.WriteLine($"Activity with id {activity.Id} updated to have activity type {updateableActivity.Type} and gear id {updateableActivity.GearId}.");
+                    //Console.WriteLine($"Activity with id {activity.Id} updated to have activity type {updateableActivity.Type} and gear id {updateableActivity.GearId}.");
                 }
             }
 
